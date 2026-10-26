@@ -28,10 +28,6 @@ A personal finance tracker built with the MEAN stack. Log income and expenses, s
 
 ![Add transaction](docs/screenshots/drawer_d.png)
 
-Mobile
-
-<img src="docs/screenshots/dashboard_m.png" width="240" /> <img src="docs/screenshots/transactions_m.png" width="240" /> <img src="docs/screenshots/drawer_m.png" width="240" />
-
 ## Tech
 
 Angular 22 (standalone, signals), Motion, Syne + Figtree type, Node.js, Express 5, MongoDB with Mongoose, JWT.
