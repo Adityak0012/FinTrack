@@ -1,0 +1,125 @@
+@if (loading()) {
+  <div class="skel-grid">
+    <div class="skeleton hero-s"></div><div class="skeleton s"></div><div class="skeleton s"></div><div class="skeleton wide"></div><div class="skeleton wide"></div>
+  </div>
+} @else if (failed()) {
+  <div class="card empty"><i class="bi bi-wifi-off"></i><h3>Could not load your overview</h3><p>Check that the server is running, then try again.</p><button class="btn" (click)="months.changed()">Try again</button></div>
+} @else if (data(); as d) {
+  @if (empty()) {
+    <div class="card empty" ftReveal>
+      <i class="bi bi-wallet2"></i>
+      <h3>Nothing recorded for {{ months.label() }}</h3>
+      <p>Add your first income or expense and this page will fill in.</p>
+      <button class="btn brand" (click)="add()"><i class="bi bi-plus-lg"></i>Add transaction</button>
+    </div>
+  } @else {
+    <div class="top-grid" ftReveal="stagger">
+      <section class="hero grain" (pointermove)="tilt($event)" (pointerleave)="untilt($event)">
+        <div class="hero-bg"></div><span class="orb o1"></span><span class="orb o2"></span><span class="glare"></span>
+        <div class="hero-in">
+          <div class="hero-top"><span class="hero-label">Balance for {{ months.label() }}</span><span class="hero-brand"><i class="bi bi-graph-up-arrow"></i>FinTrack</span></div>
+          <strong class="hero-num serif"><ft-amount [value]="d.balance" /></strong>
+          <div class="hero-meta">
+            @if (vsLast() !== null) {
+              <span class="chip-w"><i class="bi" [class]="vsLast()! <= 0 ? 'bi-arrow-down-right' : 'bi-arrow-up-right'"></i>{{ vsLast()! > 0 ? '+' : '' }}{{ vsLast() }}% spending vs last month</span>
+            }
+            <span class="chip-w ghost">Savings rate {{ d.savingsRate }}%</span>
+          </div>
+          <div class="flow">
+            <div class="flow-bar"><span class="in" [style.flex]="d.income || 1"></span><span class="out" [style.flex]="d.expense || 0.01"></span></div>
+            <div class="flow-lg"><span>Earned {{ money(d.income) }}</span><span>Spent {{ money(d.expense) }}</span></div>
+          </div>
+        </div>
+        <ft-spark class="hero-spark" [values]="spark()" color="#cdbdff" />
+      </section>
+
+      <div class="stats">
+      <section class="card stat inc">
+        <span class="s-ic inc"><i class="bi bi-arrow-down-left"></i></span>
+        <span class="s-label">Income</span>
+        <strong class="s-num"><ft-amount [value]="d.income" /></strong>
+        <span class="s-sub muted">Last month {{ money(d.previous.income) }}</span>
+      </section>
+      <section class="card stat exp">
+        <span class="s-ic exp"><i class="bi bi-arrow-up-right"></i></span>
+        <span class="s-label">Spent</span>
+        <strong class="s-num"><ft-amount [value]="d.expense" /></strong>
+        <span class="s-sub muted">
+          @if (months.isCurrent() && d.projectedExpense > d.expense) { On track for {{ money(d.projectedExpense) }} } @else { Last month {{ money(d.previous.expense) }} }
+        </span>
+      </section>
+      </div>
+    </div>
+
+    @if (insights().length) {
+      <div class="insights" ftReveal="stagger">
+        @for (i of insights(); track i.text) {
+          <div class="insight" [attr.data-tone]="i.tone"><i class="bi" [class]="i.icon"></i><span>{{ i.text }}</span></div>
+        }
+      </div>
+    }
+
+    <div class="grid-2 mid" ftReveal="stagger">
+      <section class="card">
+        <div class="card-head"><h2>Where it went</h2><span class="sub">{{ months.label() }}</span></div>
+        @if (slices().length) {
+          <div class="donut-row">
+            <ft-donut class="donut" [data]="slices()" />
+            <ul class="legend">
+              @for (c of d.byCategory.slice(0, 6); track c.category) {
+                <li>
+                  <span class="cat-chip sm" [style.--c]="cat(c.category).color"><i class="bi" [class]="cat(c.category).icon"></i></span>
+                  <span class="l-name">{{ cat(c.category).label }}</span>
+                  <span class="l-val num">{{ money(c.total) }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        } @else { <p class="muted pad">No spending this month yet.</p> }
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Income vs spending</h2><span class="sub">Last 6 months</span></div>
+        <ft-bars [data]="trend()" />
+      </section>
+    </div>
+
+    <div class="grid-2 low" ftReveal="stagger">
+      <section class="card">
+        <div class="card-head"><h2>Budgets to watch</h2><a routerLink="/budgets" class="link">All budgets <i class="bi bi-arrow-right"></i></a></div>
+        @if (d.budgetAlerts.length) {
+          <ul class="alerts">
+            @for (b of d.budgetAlerts; track b.category) {
+              <li>
+                <div class="a-top">
+                  <span class="cat-chip sm" [style.--c]="cat(b.category).color"><i class="bi" [class]="cat(b.category).icon"></i></span>
+                  <strong>{{ cat(b.category).label }}</strong>
+                  <span class="pill" [class.down]="b.spent >= b.limit" [class.warn]="b.spent < b.limit">{{ b.spent >= b.limit ? 'Over budget' : pct(b) + '% used' }}</span>
+                </div>
+                <ft-bar [pct]="pct(b)" [color]="tone(b)" />
+                <span class="muted a-sub">{{ money(b.spent) }} of {{ money(b.limit) }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="ok"><i class="bi bi-check2-circle"></i><div><strong>All budgets on track</strong><span class="muted">Nothing is above 80% of its limit.</span></div></div>
+        }
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Biggest expenses</h2><a routerLink="/transactions" class="link">All transactions <i class="bi bi-arrow-right"></i></a></div>
+        @if (d.biggest.length) {
+          <ul class="tx-list">
+            @for (t of d.biggest; track t._id) {
+              <li>
+                <span class="cat-chip" [style.--c]="cat(t.category).color"><i class="bi" [class]="cat(t.category).icon"></i></span>
+                <div class="t-main"><strong>{{ t.note || cat(t.category).label }}</strong><span class="muted">{{ cat(t.category).label }} · {{ dayLabel(t.date) }}</span></div>
+                <span class="t-amt num">−{{ money(t.amount) }}</span>
+              </li>
+            }
+          </ul>
+        } @else { <p class="muted pad">No expenses yet.</p> }
+      </section>
+    </div>
+  }
+}

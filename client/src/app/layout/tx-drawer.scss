@@ -1,0 +1,32 @@
+.scrim { position: fixed; inset: 0; z-index: 90; background: rgba(17, 17, 19, 0.45); backdrop-filter: blur(2px); animation: fade 0.25s ease both; &.out { animation: fade-out 0.2s ease both; } }
+.sheet { position: fixed; z-index: 100; top: 0; right: 0; bottom: 0; width: min(28rem, 100%); background: var(--bg); border-left: 1px solid var(--line); box-shadow: -30px 0 60px -30px rgba(17, 17, 19, 0.4); padding: 1.4rem 1.5rem 1.5rem; overflow-y: auto; animation: slide-in 0.38s var(--ease) both; &.out { animation: slide-out 0.2s ease-in both; }
+  @media (max-width: 575px) { top: auto; max-height: 92vh; width: 100%; border-radius: 0.8rem 0.8rem 0 0; animation-name: rise; &.out { animation-name: sink; } }
+}
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3rem; h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; } }
+.x { border: 0; background: var(--line-2); width: 2.3rem; height: 2.3rem; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); &:hover { background: var(--line); } }
+form { display: grid; gap: 1.1rem; }
+
+.seg { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--line-2); border-radius: 0.9rem; padding: 0.25rem;
+  .pill-bg { position: absolute; top: 0.25rem; bottom: 0.25rem; left: 0.25rem; width: calc(50% - 0.25rem); background: #fff; border-radius: 0.3rem; box-shadow: 0 1px 4px rgba(17, 17, 19, 0.14); transition: transform 0.35s var(--ease); }
+  &.is-income .pill-bg { transform: translateX(100%); }
+  button { position: relative; z-index: 1; border: 0; background: none; padding: 0.6rem; font-weight: 600; color: var(--muted); transition: color 0.2s; &[aria-selected='true'] { color: var(--ink); } }
+}
+.amount { display: flex; align-items: baseline; justify-content: flex-start; gap: 0.35rem; padding: 0.4rem 0; border-bottom: 2px solid var(--line); transition: border-color 0.2s; &:focus-within { border-color: var(--ink); } &.invalid { border-color: var(--expense); }
+  .cur { font-size: 2.6rem; color: var(--muted); line-height: 1; }
+  input { border: 0; outline: 0; background: none; font-family: var(--serif); font-size: 3.4rem; line-height: 1.1; width: 100%; max-width: 12rem; text-align: left; padding: 0; -moz-appearance: textfield; &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; } &::placeholder { color: #c3c3bf; } }
+}
+.err { color: var(--expense); font-size: 0.82rem; margin-top: -0.6rem; }
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.2rem, 1fr)); gap: 0.45rem; }
+.cat { display: flex; align-items: center; gap: 0.55rem; padding: 0.5rem 0.65rem; border: 1px solid var(--line); border-radius: 0.45rem; background: #fff; text-align: left; font-size: 0.85rem; font-weight: 500; transition: border-color 0.2s, background 0.2s, transform 0.2s var(--ease); animation: chip 0.35s var(--ease) both;
+  i { width: 1.9rem; height: 1.9rem; border-radius: 0.55rem; display: grid; place-items: center; flex: none; color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); }
+  &:hover { border-color: #b9b9b4; }
+  &.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 8%, #fff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent); }
+  &:active { transform: scale(0.97); }
+}
+@for $i from 1 through 10 { .cat:nth-child(#{$i}) { animation-delay: #{$i * 0.025s}; } }
+.actions { display: flex; gap: 0.6rem; margin-top: 0.3rem; .grow { flex: 1; } }
+
+@keyframes fade { from { opacity: 0; } } @keyframes fade-out { to { opacity: 0; } }
+@keyframes slide-in { from { transform: translateX(40px); opacity: 0; } } @keyframes slide-out { to { transform: translateX(30px); opacity: 0; } }
+@keyframes rise { from { transform: translateY(60px); opacity: 0; } } @keyframes sink { to { transform: translateY(40px); opacity: 0; } }
+@keyframes chip { from { opacity: 0; transform: translateY(8px); } }

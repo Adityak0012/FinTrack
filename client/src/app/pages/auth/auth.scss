@@ -1,0 +1,9 @@
+:host { display: block; }
+.m-logo { display: none; align-items: center; gap: 0.55rem; font-weight: 650; font-size: 1.2rem; letter-spacing: -0.03em; margin-bottom: 2rem; .mark { width: 2rem; height: 2rem; border-radius: 0.45rem; background: var(--panel); color: var(--accent); display: grid; place-items: center; } @media (max-width: 900px) { display: flex; } }
+h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1.1; margin-bottom: 0.4rem; }
+.lede { color: var(--muted); margin-bottom: 1.8rem; }
+form { display: grid; gap: 1.05rem; }
+.pw { position: relative; input { padding-right: 3rem; } button { position: absolute; right: 0.3rem; bottom: 0.3rem; width: 2.4rem; height: 2.4rem; border: 0; background: none; color: var(--muted); border-radius: 0.5rem; &:hover { color: var(--ink); } } }
+.submit { width: 100%; margin-top: 0.3rem; }
+.switch { margin-top: 1.5rem; color: var(--muted); text-align: center; a { color: var(--ink); font-weight: 700; border-bottom: 1px solid var(--accent-2); } }
+.demo { margin-top: 1.4rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; border: 1px dashed #b9b9b4; border-radius: var(--r-ctl); background: none; color: var(--ink-2); font-weight: 500; transition: background 0.2s, border-color 0.2s; &:hover { background: var(--brand-soft); border-color: var(--accent-2); color: var(--ink); } }

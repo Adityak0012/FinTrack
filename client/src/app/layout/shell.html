@@ -1,0 +1,41 @@
+<div class="shell">
+  <header class="top">
+    <div class="bar">
+      <a routerLink="/dashboard" class="logo" aria-label="FinTrack home">FinTrack<span class="dot"></span></a>
+      <nav class="menu" aria-label="Main">
+        @for (n of nav; track n.path) {
+          <a [routerLink]="n.path" routerLinkActive="active" class="item">{{ n.label }}</a>
+        }
+      </nav>
+      <div class="right">
+        <div class="month" role="group" aria-label="Choose month">
+          <button type="button" (click)="months.prev()" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button>
+          <span class="m-label num">{{ months.label() }}</span>
+          <button type="button" (click)="months.next()" [disabled]="months.isCurrent()" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
+        </div>
+        <button type="button" class="btn accent add-top" (click)="drawer.add()" aria-label="Add transaction"><i class="bi bi-plus-lg"></i><span>Add</span></button>
+        <div class="me" title="{{ auth.user()?.email }}">
+          <span class="avatar">{{ initials() }}</span>
+          <button type="button" class="out" (click)="auth.logout()" aria-label="Log out" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <h1 class="page-title">{{ heading() }}</h1>
+    <router-outlet (activate)="enter()" />
+  </main>
+
+  <footer class="foot">
+    <div class="foot-in"><span class="foot-logo">FinTrack</span><span>Know where every rupee goes. A full-stack MEAN project.</span></div>
+  </footer>
+
+  <nav class="tabs" aria-label="Main">
+    @for (n of nav; track n.path) {
+      <a [routerLink]="n.path" routerLinkActive="active" class="tab"><i class="bi" [class]="n.icon"></i><span>{{ n.label }}</span></a>
+    }
+    <button type="button" class="tab" (click)="drawer.add()"><i class="bi bi-plus-circle"></i><span>Add</span></button>
+  </nav>
+</div>
+<ft-tx-drawer />

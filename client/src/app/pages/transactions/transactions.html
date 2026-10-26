@@ -1,0 +1,69 @@
+<div class="toolbar" ftReveal>
+  <div class="search">
+    <i class="bi bi-search"></i>
+    <input type="search" placeholder="Search notes" [ngModel]="search()" (ngModelChange)="onSearch($event)" aria-label="Search transactions" />
+  </div>
+  <div class="seg-f" role="group" aria-label="Type">
+    <button type="button" [class.on]="type() === ''" (click)="setType('')">All</button>
+    <button type="button" [class.on]="type() === 'expense'" (click)="setType('expense')">Expenses</button>
+    <button type="button" [class.on]="type() === 'income'" (click)="setType('income')">Income</button>
+  </div>
+  <select [ngModel]="category()" (ngModelChange)="category.set($event)" aria-label="Category">
+    <option value="">All categories</option>
+    @for (c of options(); track c.key) { <option [value]="c.key">{{ c.label }}</option> }
+  </select>
+  <button class="btn ghost" (click)="export()" [disabled]="exporting()"><i class="bi bi-download"></i><span>Export CSV</span></button>
+</div>
+
+@if (data(); as d) {
+  <div class="sums" ftReveal="stagger">
+    <div class="sum"><span class="muted">Income</span><strong class="num income">{{ money(d.totals.income) }}</strong></div>
+    <div class="sum"><span class="muted">Spent</span><strong class="num expense">{{ money(d.totals.expense) }}</strong></div>
+    <div class="sum"><span class="muted">Showing</span><strong class="num">{{ d.total }} {{ d.total === 1 ? 'entry' : 'entries' }}</strong></div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="card list"><div class="skeleton row-s"></div><div class="skeleton row-s"></div><div class="skeleton row-s"></div><div class="skeleton row-s"></div></div>
+} @else if (failed()) {
+  <div class="card empty"><i class="bi bi-wifi-off"></i><h3>Could not load transactions</h3><p>Check that the server is running.</p><button class="btn" (click)="months.changed()">Try again</button></div>
+} @else if (!groups().length) {
+  <div class="card empty">
+    <i class="bi" [class]="filtered() ? 'bi-funnel' : 'bi-receipt'"></i>
+    @if (filtered()) {
+      <h3>No matches</h3><p>Nothing in {{ months.label() }} fits these filters.</p><button class="btn ghost" (click)="clear()">Clear filters</button>
+    } @else {
+      <h3>No transactions in {{ months.label() }}</h3><p>Add one to start building this month.</p><button class="btn brand" (click)="drawer.add()"><i class="bi bi-plus-lg"></i>Add transaction</button>
+    }
+  </div>
+} @else {
+  <div class="groups">
+    @for (g of groups(); track g.key) {
+      <section class="group card">
+        <header><h2>{{ g.heading }}</h2><span class="num" [class.income]="g.net > 0" [class.muted]="g.net <= 0">{{ g.net > 0 ? '+' : '−' }}{{ money(g.net < 0 ? -g.net : g.net) }}</span></header>
+        <ul>
+          @for (t of g.items; track t._id) {
+            <li>
+              <button type="button" class="row" (click)="drawer.edit(t)" [attr.aria-label]="'Edit ' + (t.note || cat(t.category).label)">
+                <span class="cat-chip" [style.--c]="cat(t.category).color"><i class="bi" [class]="cat(t.category).icon"></i></span>
+                <span class="r-main"><strong>{{ t.note || cat(t.category).label }}</strong><span class="muted">{{ cat(t.category).label }}</span></span>
+                <span class="r-amt num" [class.income]="t.type === 'income'">{{ t.type === 'income' ? '+' : '−' }}{{ money(t.amount) }}</span>
+                <i class="bi bi-pencil r-edit"></i>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  @if (data(); as d) {
+    @if (d.pages > 1) {
+      <nav class="pager" aria-label="Pages">
+        <button class="btn ghost sm" (click)="go(d.page - 1)" [disabled]="d.page <= 1"><i class="bi bi-chevron-left"></i>Previous</button>
+        <span class="muted">Page {{ d.page }} of {{ d.pages }}</span>
+        <button class="btn ghost sm" (click)="go(d.page + 1)" [disabled]="d.page >= d.pages">Next<i class="bi bi-chevron-right"></i></button>
+      </nav>
+    }
+  }
+}

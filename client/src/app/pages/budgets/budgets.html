@@ -1,0 +1,59 @@
+@if (failed()) {
+  <div class="card empty"><i class="bi bi-wifi-off"></i><h3>Could not load budgets</h3><p>Check that the server is running.</p><button class="btn" (click)="months.changed()">Try again</button></div>
+} @else if (items(); as list) {
+  <section class="summary card" ftReveal>
+    <div class="sum-main">
+      <span class="muted">Spent of total budget</span>
+      <strong class="serif big"><ft-amount [value]="totalSpent()" /></strong>
+      <span class="muted">of {{ money(totalLimit()) }} across {{ list.length }} {{ list.length === 1 ? 'category' : 'categories' }}</span>
+    </div>
+    <div class="sum-bar">
+      <ft-bar [pct]="overall()" [color]="overall() >= 100 ? 'var(--expense)' : overall() >= 80 ? 'var(--amber)' : 'var(--brand)'" />
+      <span class="muted">{{ overall() }}% used</span>
+    </div>
+    <button class="btn brand" (click)="adding.set(!adding())" [disabled]="!available().length"><i class="bi" [class]="adding() ? 'bi-x-lg' : 'bi-plus-lg'"></i>{{ adding() ? 'Cancel' : 'New budget' }}</button>
+  </section>
+
+  @if (adding()) {
+    <form class="card add-form" (ngSubmit)="create()">
+      <div class="field"><label for="nc">Category</label>
+        <select id="nc" [ngModel]="newCat()" (ngModelChange)="newCat.set($event)" name="c"><option value="">Choose a category</option>@for (c of available(); track c.key) { <option [value]="c.key">{{ c.label }}</option> }</select></div>
+      <div class="field"><label for="nl">Monthly limit (₹)</label><input id="nl" type="number" min="1" inputmode="decimal" placeholder="5000" [ngModel]="newLimit() || null" (ngModelChange)="newLimit.set(+$event || 0)" name="l" /></div>
+      <button class="btn brand" type="submit" [disabled]="!newCat() || !(newLimit() > 0)">Save budget</button>
+    </form>
+  }
+
+  @if (!list.length) {
+    <div class="card empty" ftReveal><i class="bi bi-bullseye"></i><h3>No budgets yet</h3><p>Set a monthly limit for a category and FinTrack warns you at 80%.</p><button class="btn brand" (click)="adding.set(true)"><i class="bi bi-plus-lg"></i>New budget</button></div>
+  } @else {
+    <div class="cards" ftReveal="stagger">
+      @for (b of sorted(); track b.category) {
+        <article class="card b" [attr.data-state]="state(b)">
+          <header>
+            <span class="cat-chip" [style.--c]="cat(b.category).color"><i class="bi" [class]="cat(b.category).icon"></i></span>
+            <div class="b-name"><strong>{{ cat(b.category).label }}</strong><span class="muted">{{ left(b) }}</span></div>
+            @if (state(b) !== 'ok') { <span class="pill" [class.down]="state(b) === 'over'" [class.warn]="state(b) === 'warn'">{{ state(b) === 'over' ? 'Over' : 'Near limit' }}</span> }
+          </header>
+          <ft-bar [pct]="pct(b)" [color]="color(b)" />
+          @if (editing() === b.category) {
+            <form class="inline" (ngSubmit)="saveEdit(b)">
+              <input type="number" min="1" [ngModel]="draft()" (ngModelChange)="draft.set(+$event || 0)" name="d" aria-label="Monthly limit" />
+              <button class="btn brand sm" type="submit">Save</button>
+              <button class="btn ghost sm" type="button" (click)="editing.set(null)">Cancel</button>
+            </form>
+          } @else {
+            <footer>
+              <span class="num"><strong>{{ money(b.spent) }}</strong><span class="muted"> of {{ money(b.limit) }}</span></span>
+              <span class="acts">
+                <button type="button" (click)="startEdit(b)" aria-label="Change limit" title="Change limit"><i class="bi bi-pencil"></i></button>
+                <button type="button" (click)="remove(b)" aria-label="Remove budget" title="Remove budget"><i class="bi bi-trash3"></i></button>
+              </span>
+            </footer>
+          }
+        </article>
+      }
+    </div>
+  }
+} @else {
+  <div class="skeleton" style="height: 8rem"></div>
+}

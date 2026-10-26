@@ -1,0 +1,30 @@
+:host { display: block; }
+.shell { min-height: 100vh; display: flex; flex-direction: column; @media (max-width: 860px) { padding-bottom: 4.6rem; } }
+
+// ----- Top bar -----
+.top { position: sticky; top: 0; z-index: 40; background: rgba(245, 245, 243, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.bar { max-width: 80rem; margin: 0 auto; display: flex; align-items: center; gap: 2rem; padding: 0.95rem clamp(1rem, 3vw, 2.25rem); }
+.logo { font-family: var(--serif); font-weight: 800; font-size: 1.6rem; letter-spacing: -0.05em; display: inline-flex; align-items: baseline; gap: 0.12rem; .dot { width: 0.42rem; height: 0.42rem; border-radius: 50%; background: var(--accent-2); display: inline-block; } }
+.menu { display: flex; gap: 1.6rem; @media (max-width: 860px) { display: none; } }
+.item { position: relative; font-weight: 500; padding: 0.3rem 0; color: var(--ink); &::after { content: ''; position: absolute; left: 0; right: 0; bottom: -0.2rem; height: 2px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 0.35s var(--ease); } &:hover::after, &.active::after { transform: scaleX(1); } &.active { font-weight: 650; } }
+.right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+.month { display: inline-flex; align-items: center; border-bottom: 1px solid var(--ink);
+  button { width: 2rem; height: 2.1rem; border: 0; background: none; display: grid; place-items: center; &:disabled { opacity: 0.25; cursor: default; } &:hover:not(:disabled) { color: var(--accent-2); } }
+  .m-label { min-width: 8.3rem; text-align: center; font-weight: 550; font-size: 0.92rem; @media (max-width: 575px) { min-width: 6.6rem; font-size: 0.82rem; } } }
+.add-top { padding: 0.55rem 1rem; @media (max-width: 860px) { display: none; } }
+.me { display: flex; align-items: center; gap: 0.3rem; @media (max-width: 575px) { display: none; } }
+.avatar { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--panel); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 0.78rem; font-family: var(--serif); }
+.out { border: 0; background: none; color: var(--muted); font-size: 1.1rem; padding: 0.35rem; border-radius: 0.4rem; display: grid; &:hover { color: var(--expense); background: var(--expense-soft); } }
+@media (max-width: 860px) { .bar { gap: 0.8rem; } .logo { font-size: 1.35rem; } }
+
+// ----- Content -----
+.content { flex: 1; width: 100%; max-width: 80rem; margin: 0 auto; padding: 2.2rem clamp(1rem, 3vw, 2.25rem) 4rem; }
+.page-title { font-size: clamp(2rem, 4.4vw, 3.2rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1.05; margin-bottom: 1.6rem; }
+
+// ----- Footer (charcoal, like ShopNest) -----
+.foot { background: var(--panel); color: #fff; @media (max-width: 860px) { display: none; } }
+.foot-in { max-width: 80rem; margin: 0 auto; padding: 2.2rem clamp(1rem, 3vw, 2.25rem); display: flex; gap: 2rem; align-items: baseline; color: #9a9aa0; .foot-logo { font-family: var(--serif); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.05em; color: #fff; } }
+
+// ----- Mobile tab bar -----
+.tabs { display: none; @media (max-width: 860px) { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 0.35rem 0.4rem calc(0.35rem + env(safe-area-inset-bottom)); } }
+.tab { display: grid; justify-items: center; gap: 0.1rem; padding: 0.4rem 0.2rem; border: 0; background: none; color: var(--muted); font-size: 0.68rem; font-weight: 500; border-radius: 0.5rem; i { font-size: 1.25rem; } &.active { color: var(--ink); font-weight: 700; i { background: var(--accent); border-radius: 999px; padding: 0 0.7rem; } } }

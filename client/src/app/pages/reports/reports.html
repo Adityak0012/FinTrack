@@ -1,0 +1,54 @@
+@if (failed()) {
+  <div class="card empty"><i class="bi bi-wifi-off"></i><h3>Could not load reports</h3><p>Check that the server is running.</p><button class="btn" (click)="months.changed()">Try again</button></div>
+} @else if (trend(); as t) {
+  <div class="kpis" ftReveal="stagger">
+    <div class="card k"><span class="muted">Income, 12 months</span><strong class="num">{{ money(totals().income) }}</strong></div>
+    <div class="card k"><span class="muted">Spent, 12 months</span><strong class="num">{{ money(totals().expense) }}</strong></div>
+    <div class="card k"><span class="muted">Saved</span><strong class="num" [class.income]="totals().net >= 0" [class.expense]="totals().net < 0">{{ money(totals().net) }}</strong></div>
+    <div class="card k"><span class="muted">Average monthly spend</span><strong class="num">{{ money(totals().avg) }}</strong></div>
+  </div>
+
+  <section class="card chart" ftReveal>
+    <div class="card-head"><h2>Income vs spending</h2><span class="sub">12 months to {{ months.label() }}</span></div>
+    <ft-bars [data]="t" />
+  </section>
+
+  <div class="grid-2 low" ftReveal="stagger">
+    <section class="card">
+      <div class="card-head"><h2>Month by month</h2><button class="btn ghost sm" (click)="export()" [disabled]="exporting()"><i class="bi bi-download"></i>CSV for {{ monthShort(months.month()) }}</button></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Month</th><th class="r">Income</th><th class="r">Spent</th><th class="r">Saved</th></tr></thead>
+          <tbody>
+            @for (r of rows(); track r.month) {
+              <tr [class.cur]="r.month === months.month()">
+                <td>{{ monthShort(r.month) }} {{ r.month.slice(2, 4) }}</td>
+                <td class="r num">{{ compact(r.income) }}</td>
+                <td class="r num">{{ compact(r.expense) }}</td>
+                <td class="r num" [class.income]="r.net > 0" [class.expense]="r.net < 0">{{ r.income || r.expense ? compact(r.net) : '–' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Category breakdown</h2><span class="sub">{{ months.label() }}</span></div>
+      @if (overview(); as o) {
+        @if (o.byCategory.length) {
+          <ul class="cats">
+            @for (c of o.byCategory; track c.category) {
+              <li>
+                <div class="c-top"><span class="cat-chip sm" [style.--c]="cat(c.category).color"><i class="bi" [class]="cat(c.category).icon"></i></span><strong>{{ cat(c.category).label }}</strong><span class="num c-val">{{ money(c.total) }}</span></div>
+                <ft-bar [pct]="(c.total / topMax()) * 100" [color]="cat(c.category).color" />
+              </li>
+            }
+          </ul>
+        } @else { <p class="muted pad">No spending in {{ months.label() }}.</p> }
+      }
+    </section>
+  </div>
+} @else {
+  <div class="skeleton" style="height: 22rem"></div>
+}
